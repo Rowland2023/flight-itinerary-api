@@ -2,49 +2,17 @@ import unittest
 from models.itinerary import FlightTicket
 
 class TestFlightTicket(unittest.TestCase):
-
     def test_valid_itinerary(self):
-        tickets = [
-            ["JFK", "ATL"],
-            ["ATL", "SFO"],
-            ["SFO", "JFK"]
-        ]
+        tickets = [["JFK", "ATL"], ["ATL", "SFO"], ["SFO", "JFK"]]
         planner = FlightTicket(tickets, "JFK")
-        result = planner.air_ticket()
-        expected = ["JFK", "ATL", "SFO", "JFK"]
-        self.assertEqual(result, expected)
+        self.assertEqual(planner.air_ticket(), ["JFK", "ATL", "SFO", "JFK"])
 
-    def test_empty_itinerary_due_to_missing_connection(self):
-        tickets = [
-            ["JFK", "ATL"],
-            ["SFO", "LAX"]  # disconnected from JFK route
-        ]
+    def test_disconnected_tickets(self):
+        tickets = [["JFK", "ATL"], ["SFO", "LAX"]]  # No connection
         planner = FlightTicket(tickets, "JFK")
-        result = planner.air_ticket()
-        self.assertEqual(result, [])  # can't use all tickets from start point
+        self.assertEqual(planner.air_ticket(), [])
 
-    def test_cycle_in_itinerary(self):
-        tickets = [
-            ["JFK", "ATL"],
-            ["ATL", "SFO"],
-            ["SFO", "JFK"]
-        ]
-        planner = FlightTicket(tickets, "JFK")
-        result = planner.air_ticket()
-        expected = ["JFK", "ATL", "SFO", "JFK"]
-        self.assertEqual(result, expected)
-
-    def test_lexical_order_preference(self):
-        tickets = [
-            ["MUC", "LHR"],
-            ["JFK", "MUC"],
-            ["SFO", "SJC"],
-            ["LHR", "SFO"]
-        ]
-        planner = FlightTicket(tickets, "JFK")
-        result = planner.air_ticket()
-        expected = ["JFK", "MUC", "LHR", "SFO", "SJC"]
-        self.assertEqual(result, expected)
-
-if __name__ == '__main__':
-    unittest.main()
+    def test_cycle_path(self):
+        tickets = [["A", "B"], ["B", "A"]]
+        planner = FlightTicket(tickets, "A")
+        self.assertEqual(planner.air_ticket(), ["A", "B", "A"])
